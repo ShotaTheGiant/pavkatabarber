@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Public: which time slots are taken (no personal data)
+    match /barber_slots/{id} {
+      allow read: if true;
+      allow create: if true;
+      allow delete: if request.auth != null
+        && request.auth.token.email.lower() == "dim.yazovaliyskii@gmail.com";
+    }
+
+    // Private: customer name and phone. Anyone can create, only the admin reads/deletes
+    match /barber_bookings/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null
+        && request.auth.token.email.lower() == "dim.yazovaliyskii@gmail.com";
+    }
+  }
+}
